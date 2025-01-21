@@ -39,6 +39,9 @@ function App() {
       claimAPI.airdrop.getUserClaim({ account: connectedAddress.toRawString(), id: "1f94c970-4b76-42b8-8372-5ec11029d8e1" }).then(userClaim => {
         setClaimStatusLoading(false);
         setUserClaim(userClaim);
+      }).catch(() => {
+        setClaimStatusLoading(false);
+        setUserClaim(null);
       })
     }
   }, [connectedAddress]);
