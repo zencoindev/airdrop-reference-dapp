@@ -11,7 +11,9 @@ export const ListItem = memo<ListItemProps>((props) => {
       <div className="body1 secondary">
         {props.title}
       </div>
-      {props.children}
+      <b>
+        {props.children}
+      </b>
     </div>
   );
 });

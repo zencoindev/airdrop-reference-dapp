@@ -4,16 +4,25 @@ import { useTonAddress, useTonConnectUI } from "@tonconnect/ui-react";
 import { Address } from "@ton/core";
 
 import "./App.css";
-import { List } from "./components/List/List.tsx";
-import { Loader } from "./components/Loader/Loader.tsx";
+import { List } from "./components/List/List";
+import { Loader } from "./components/Loader/Loader";
 import { claimAPI } from "./api";
-import { UserClaim } from "./api/claimAPI.ts";
-import { isValidAddress } from "./utils/address.ts";
-import { showConfetti } from "./utils/confetti.ts";
+import { UserClaim } from "./api/claimAPI";
+import { isValidAddress } from "./utils/address";
+import { showConfetti } from "./utils/confetti";
+import tonapi from "./tonapi";
+import { JettonInfo } from "@ton-api/client";
+import { fromNano } from "./utils/decimals";
+
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 
 function App() {
   const [isClaimStatusLoading, setClaimStatusLoading] = useState(true);
   const [userClaim, setUserClaim] = useState<UserClaim | null>(null);
+  const [jettonInfo, setJettonInfo] = useState<JettonInfo | null>(null);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   const [tonConnectUI] = useTonConnectUI();
 
@@ -33,6 +42,23 @@ function App() {
       });
     }, 400);
   }, [tonConnectUI]);
+
+  useEffect(() => {
+    async function loadJettonInfo() {
+      const claimAddress = import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
+      const storageKey = `jetton_${claimAddress}`;
+      const storedInfo = localStorage.getItem(storageKey);
+      if (storedInfo) {
+        setJettonInfo(JSON.parse(storedInfo));
+        return;
+      }
+      const jettonInfo = await tonapi.jettons.getJettonInfo(Address.parse(claimAddress));
+      setJettonInfo(jettonInfo);
+      localStorage.setItem(storageKey, JSON.stringify(jettonInfo));
+    }
+
+    loadJettonInfo();
+  }, []);
 
   useEffect(() => {
     if (connectedAddress) {
@@ -62,6 +88,7 @@ function App() {
         }
       ],
     }).then(() => {
+      setIsClaiming(true);
       showConfetti();
     });
 
@@ -86,17 +113,21 @@ function App() {
   return (
     <div className={"mw60"}>
       <div className={"padding-top"} />
+      {jettonInfo && <img alt={jettonInfo.metadata.name} className="jetton-logo" src={jettonInfo.preview} />}
       <div className="desc-container mb32">
         <h2>Claim your token</h2>
       </div>
       <List>
         <List.Item title={"Amount"}>
-          {userClaim.amount}
+          {fromNano(userClaim.amount, jettonInfo?.metadata.decimals ?? 9)} {jettonInfo?.metadata.symbol}
+        </List.Item>
+        <List.Item title={"To be paid"}>
+          ~{fromNano(userClaim.claim_message.amount)} TON
         </List.Item>
       </List>
       <div className="end-page">
         <div className="mw60">
-          <button className="button primary" onClick={handleSendMessage}><div className="label1">Claim!</div></button>
+          <button disabled={isClaiming} className="button primary" onClick={handleSendMessage}><div className="label1">Claim!</div></button>
         </div>
       </div>
     </div>
