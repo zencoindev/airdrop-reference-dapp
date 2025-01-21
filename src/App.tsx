@@ -36,7 +36,7 @@ function App() {
 
   useEffect(() => {
     if (connectedAddress) {
-      claimAPI.airdrop.getUserClaim({ account: connectedAddress.toRawString(), id: "1f94c970-4b76-42b8-8372-5ec11029d8e1" }).then(userClaim => {
+      claimAPI.airdrop.getUserClaim({ account: connectedAddress.toRawString(), id: import.meta.env.VITE_CLAIM_UUID }).then(userClaim => {
         setClaimStatusLoading(false);
         setUserClaim(userClaim);
       }).catch(() => {
@@ -84,7 +84,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className={"mw60"}>
       <div className={"padding-top"} />
       <div className="desc-container mb32">
         <h2>Claim your token</h2>
@@ -95,9 +95,11 @@ function App() {
         </List.Item>
       </List>
       <div className="end-page">
-        <button className="button primary" onClick={handleSendMessage}><div className="label1">Claim!</div></button>
+        <div className="mw60">
+          <button className="button primary" onClick={handleSendMessage}><div className="label1">Claim!</div></button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 

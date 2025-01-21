@@ -136,6 +136,8 @@ button, input[type="submit"], input[type="reset"] {
   left: 16px;
   right: 16px;
   padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  justify-content: center;
 }
 
 .placeholder {
