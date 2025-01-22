@@ -18,13 +18,22 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
+function useQuery() {
+  return useMemo(() => new URLSearchParams(window.location.search), [window.location.search]);
+}
+
 function App() {
+  const query = useQuery();
   const [isClaimStatusLoading, setClaimStatusLoading] = useState(true);
   const [userClaim, setUserClaim] = useState<UserClaim | null>(null);
   const [jettonInfo, setJettonInfo] = useState<JettonInfo | null>(null);
   const [isClaiming, setIsClaiming] = useState(false);
 
   const [tonConnectUI] = useTonConnectUI();
+
+  const claimId = query.get("claimId") ?? import.meta.env.VITE_CLAIM_UUID;
+  const claimJettonAddress = query.get("claimJetton") ?? import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
+
 
   const connectedAddressString = useTonAddress();
   const connectedAddress = useMemo(() => {
@@ -45,14 +54,13 @@ function App() {
 
   useEffect(() => {
     async function loadJettonInfo() {
-      const claimAddress = import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
-      const storageKey = `jetton_${claimAddress}`;
+      const storageKey = `jetton_${claimJettonAddress}`;
       const storedInfo = localStorage.getItem(storageKey);
       if (storedInfo) {
         setJettonInfo(JSON.parse(storedInfo));
         return;
       }
-      const jettonInfo = await tonapi.jettons.getJettonInfo(Address.parse(claimAddress));
+      const jettonInfo = await tonapi.jettons.getJettonInfo(Address.parse(claimJettonAddress));
       setJettonInfo(jettonInfo);
       localStorage.setItem(storageKey, JSON.stringify(jettonInfo));
     }
@@ -62,7 +70,7 @@ function App() {
 
   useEffect(() => {
     if (connectedAddress) {
-      claimAPI.airdrop.getUserClaim({ account: connectedAddress.toRawString(), id: import.meta.env.VITE_CLAIM_UUID }).then(userClaim => {
+      claimAPI.airdrop.getUserClaim({ account: connectedAddress.toRawString(), id: claimId }).then(userClaim => {
         setClaimStatusLoading(false);
         setUserClaim(userClaim);
       }).catch(() => {
@@ -93,6 +101,14 @@ function App() {
     });
 
   }, [tonConnectUI, userClaim?.claim_message]);
+
+  if (!claimId || !claimJettonAddress) {
+    return (
+      <div className="placeholder">
+        <div className="body1 secondary">Claim ID or Jetton address is not provided.</div>
+      </div>
+    )
+  }
 
   if (isClaimStatusLoading) {
     return (
