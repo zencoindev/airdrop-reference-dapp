@@ -51,11 +51,19 @@ body {
 #root {
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+}
+
+.tonconnectButton {
+  margin-top: 20px;
+  margin-left: auto;
 }
 
 .mw60 {
   flex: 1;
-  max-width: 860px;
 }
 
 @media (prefers-color-scheme: light) {
