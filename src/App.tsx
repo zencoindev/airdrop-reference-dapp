@@ -1,28 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
+import { TonApiClient } from '@ton-api/client';
 import { Address } from '@ton/core';
 
 import './App.css';
 import { List } from './components/List/List';
 import { Loader } from './components/Loader/Loader';
-import { claimAPI } from './api';
-import { UserClaim } from './api/claimAPI';
-import { isValidAddress } from './utils/address';
 import { showConfetti } from './utils/confetti';
-import tonapi from './tonapi';
 import { JettonInfo } from '@ton-api/client';
 import { fromNano } from './utils/decimals';
+import { UserClaim } from './types/airdrop';
+
+const ta = new TonApiClient({
+    baseUrl: import.meta.env.VITE_TONAPI_ENDPOINT ?? 'https://tonapi.io',
+});
 
 BigInt.prototype.toJSON = function () {
     return this.toString();
 };
 
 function useQuery() {
-    return useMemo(
-        () => new URLSearchParams(window.location.search),
-        [window.location.search]
-    );
+    return useMemo(() => new URLSearchParams(window.location.search), []);
 }
 
 function App() {
@@ -35,52 +34,32 @@ function App() {
     const [tonConnectUI] = useTonConnectUI();
 
     const claimId = query.get('claimId') ?? import.meta.env.VITE_CLAIM_UUID;
-    const claimJettonAddress =
-        query.get('claimJetton') ?? import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
+    const claimJettonAddress = query.get('claimJetton') ?? import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
 
-    const connectedAddressString = useTonAddress();
-    const connectedAddress = useMemo(() => {
-        return isValidAddress(connectedAddressString)
-            ? Address.parse(connectedAddressString)
-            : null;
-    }, [connectedAddressString]);
+    const connectedAddress = useTonAddress();
 
     useEffect(() => {
-        setTimeout(() => {
+        setTimeout(() =>
             tonConnectUI.connectionRestored.then((connected) => {
-                if (!connected) {
-                    tonConnectUI.openModal();
-                }
-            });
-        }, 400);
+                if (!connected) { tonConnectUI.openModal() }
+            }),
+            400
+        );
     }, [tonConnectUI]);
 
     useEffect(() => {
-        async function loadJettonInfo() {
-            const storageKey = `jetton_${claimJettonAddress}`;
-            const storedInfo = localStorage.getItem(storageKey);
-            if (storedInfo) {
-                setJettonInfo(JSON.parse(storedInfo));
-                return;
-            }
-            const jettonInfo = await tonapi.jettons.getJettonInfo(
-                Address.parse(claimJettonAddress)
-            );
-            setJettonInfo(jettonInfo);
-            localStorage.setItem(storageKey, JSON.stringify(jettonInfo));
-        }
-
-        loadJettonInfo();
-    }, []);
+        ta.jettons
+            .getJettonInfo(Address.parse(claimJettonAddress))
+            .then(setJettonInfo);
+    }, [claimJettonAddress]);
 
     useEffect(() => {
         if (connectedAddress) {
-            claimAPI.airdrop
-                .getUserClaim({
-                    account: connectedAddress.toRawString(),
-                    id: claimId,
-                })
-                .then((userClaim) => {
+            fetch(
+                `https://mainnet-airdrop.tonapi.io/v1/airdrop/claim/${connectedAddress}?id=${claimId}`
+            )
+                .then((response) => response.json())
+                .then((userClaim: UserClaim) => {
                     setClaimStatusLoading(false);
                     setUserClaim(userClaim);
                 })
@@ -92,22 +71,22 @@ function App() {
             setClaimStatusLoading(false);
             setUserClaim(null);
         }
-    }, [connectedAddress]);
+    }, [connectedAddress, claimId]);
 
     const handleSendMessage = useCallback(() => {
-        const claimMessage = userClaim?.claim_message;
-        if (!claimMessage) {
+        if (!userClaim) {
             return;
         }
+
         tonConnectUI
             .sendTransaction({
-                validUntil: Math.floor(Date.now() / 1000) + 300,
+                validUntil: Math.floor(Date.now() / 1000) + 300, // 5 minutes
                 messages: [
                     {
-                        address: claimMessage.address,
-                        amount: claimMessage.amount,
-                        payload: claimMessage.payload,
-                        stateInit: claimMessage.state_init,
+                        address: userClaim.claim_message.address,
+                        amount: userClaim.claim_message.amount,
+                        payload: userClaim.claim_message.payload,
+                        stateInit: userClaim.claim_message.state_init,
                     },
                 ],
             })
@@ -115,7 +94,7 @@ function App() {
                 setIsClaiming(true);
                 showConfetti();
             });
-    }, [tonConnectUI, userClaim?.claim_message]);
+    }, [tonConnectUI, userClaim]);
 
     if (!claimId || !claimJettonAddress) {
         return (
