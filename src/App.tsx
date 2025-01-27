@@ -16,10 +16,6 @@ const ta = new TonApiClient({
     baseUrl: import.meta.env.VITE_TONAPI_ENDPOINT ?? 'https://tonapi.io',
 });
 
-BigInt.prototype.toJSON = function () {
-    return this.toString();
-};
-
 function useQuery() {
     return useMemo(() => new URLSearchParams(window.location.search), []);
 }
@@ -28,13 +24,14 @@ function App() {
     const query = useQuery();
     const [isClaimStatusLoading, setClaimStatusLoading] = useState(true);
     const [userClaim, setUserClaim] = useState<UserClaim | null>(null);
+    
+    const [jettonAddress, setJettonAddress] = useState<string | null>(null);
     const [jettonInfo, setJettonInfo] = useState<JettonInfo | null>(null);
     const [isClaiming, setIsClaiming] = useState(false);
 
     const [tonConnectUI] = useTonConnectUI();
 
     const claimId = query.get('claimId') ?? import.meta.env.VITE_CLAIM_UUID;
-    const claimJettonAddress = query.get('claimJetton') ?? import.meta.env.VITE_CLAIM_TOKEN_ADDRESS;
 
     const connectedAddress = useTonAddress();
 
@@ -48,10 +45,12 @@ function App() {
     }, [tonConnectUI]);
 
     useEffect(() => {
+        if (!jettonAddress) { return; }
+
         ta.jettons
-            .getJettonInfo(Address.parse(claimJettonAddress))
+            .getJettonInfo(Address.parse(jettonAddress))
             .then(setJettonInfo);
-    }, [claimJettonAddress]);
+    }, [jettonAddress]);
 
     useEffect(() => {
         if (connectedAddress) {
@@ -62,10 +61,12 @@ function App() {
                 .then((userClaim: UserClaim) => {
                     setClaimStatusLoading(false);
                     setUserClaim(userClaim);
+                    setJettonAddress(userClaim.jetton);
                 })
                 .catch(() => {
                     setClaimStatusLoading(false);
                     setUserClaim(null);
+                    setJettonAddress(null);
                 });
         } else {
             setClaimStatusLoading(false);
@@ -96,11 +97,11 @@ function App() {
             });
     }, [tonConnectUI, userClaim]);
 
-    if (!claimId || !claimJettonAddress) {
+    if (!claimId) {
         return (
             <div className="placeholder">
                 <div className="body1 secondary">
-                    Claim ID or Jetton address is not provided.
+                    Claim ID is not provided.
                 </div>
             </div>
         );
@@ -124,7 +125,7 @@ function App() {
         );
     }
 
-    if (!userClaim?.amount) {
+    if (!userClaim?.jetton_amount) {
         return (
             <div className="placeholder">
                 <div className="body1 secondary">
@@ -150,7 +151,7 @@ function App() {
             <List>
                 <List.Item title={'Amount'}>
                     {fromNano(
-                        userClaim.amount,
+                        userClaim.jetton_amount,
                         jettonInfo?.metadata.decimals ?? 9
                     )}{' '}
                     {jettonInfo?.metadata.symbol}
