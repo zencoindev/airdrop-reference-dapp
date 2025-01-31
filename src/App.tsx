@@ -31,7 +31,7 @@ function App() {
 
     const [tonConnectUI] = useTonConnectUI();
 
-    const claimId = query.get('claimId') ?? import.meta.env.VITE_CLAIM_UUID;
+    const airdropId = query.get('airdropId') ?? import.meta.env.VITE_AIRDROP_UUID;
 
     const connectedAddress = useTonAddress();
 
@@ -55,7 +55,7 @@ function App() {
     useEffect(() => {
         if (connectedAddress) {
             fetch(
-                `https://mainnet-airdrop.tonapi.io/v1/airdrop/claim/${connectedAddress}?id=${claimId}`
+                `https://mainnet-airdrop.tonapi.io/v1/airdrop/claim/${connectedAddress}?id=${airdropId}`
             )
                 .then((response) => response.json())
                 .then((userClaim: UserClaim) => {
@@ -72,7 +72,7 @@ function App() {
             setClaimStatusLoading(false);
             setUserClaim(null);
         }
-    }, [connectedAddress, claimId]);
+    }, [connectedAddress, airdropId]);
 
     const handleSendMessage = useCallback(() => {
         if (!userClaim) {
@@ -97,11 +97,11 @@ function App() {
             });
     }, [tonConnectUI, userClaim]);
 
-    if (!claimId) {
+    if (!airdropId) {
         return (
             <div className="placeholder">
                 <div className="body1 secondary">
-                    Claim ID is not provided.
+                    Airdrop ID is not provided.
                 </div>
             </div>
         );
