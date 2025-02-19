@@ -1,9 +1,11 @@
-import BigNumber from "bignumber.js";
+export function toDecimals(num: bigint | number | string, decimals: number | string): string {
+  const dec = Number(decimals);
+  const strNum = BigInt(num)
+      .toString()
+      .padStart(dec + 1, '0');
 
-export function fromNano(amount: string, decimals: string | number = 9) {
-  return new BigNumber(amount).dividedBy(new BigNumber(10).pow(decimals)).toString()
-}
+  const intPart = strNum.slice(0, -dec);
+  const fracPart = strNum.slice(-dec).replace(/0+$/, '');
 
-export function toNano(amount: string, decimals: string | number = 9) {
-  return new BigNumber(amount).multipliedBy(new BigNumber(10).pow(decimals)).toString()
+  return [intPart, fracPart].filter(Boolean).join('.');
 }
