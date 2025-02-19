@@ -41,11 +41,9 @@ Before you begin, ensure you have the following tools installed on your computer
 Create a `.env` file in the root of the project and add the following variables:
 
 ```env
-VITE_TONAPI_ENDPOINT=https://tonapi.io
 VITE_AIRDROP_UUID=your-claim-uuid
 ```
 
-- `VITE_TONAPI_ENDPOINT`: Base URL for TonAPI. Defaults to `https://tonapi.io` if not specified.
 - `VITE_AIRDROP_UUID`: Unique identifier for the airdrop. Obtain this from your airdrop service.
 
 ### Running the Application
