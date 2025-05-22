@@ -1,5 +1,7 @@
 # Airdrop Reference DApp
 
+> **Note:** The original v1 version of this DApp is available in the [`v1` branch](https://github.com/tonkeeper/airdrop-reference-dapp/tree/v1) of this repository.
+
 [![Demo](https://img.shields.io/badge/Demo-View%20Site-blue)](https://tonkeeper.github.io/airdrop-reference-dapp/)
 
 ## Description
