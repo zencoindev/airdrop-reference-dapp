@@ -193,8 +193,8 @@ function App() {
         setJettonAddress(previewJetton);    
         setIsClaiming(false);
 
-        // const baseUrl = `${testnet ? 'testnet' : 'mainnet'}-airdrop.tonapi.io`;
-        const baseUrl = `demo-airdrop.tonapi.io`;
+        const baseUrl = `${testnet ? 'testnet' : 'mainnet'}-airdrop.tonapi.io`;
+        // const baseUrl = `demo-airdrop.tonapi.io`;
         const url = `https://${baseUrl}/v2/airdrop/claim/${connectedAddress}?id=${airdropId}`;
 
         fetch(url)
