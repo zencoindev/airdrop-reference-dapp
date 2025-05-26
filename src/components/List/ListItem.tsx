@@ -8,10 +8,10 @@ export interface ListItemProps {
 export const ListItem = memo<ListItemProps>((props) => {
   return (
     <div className="item">
-      <div className="body1 secondary">
+      <div className="secondary item-title">
         {props.title}
       </div>
-      <b>
+      <b className="item-value">
         {props.children}
       </b>
     </div>

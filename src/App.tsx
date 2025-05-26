@@ -258,7 +258,7 @@ function App() {
     if (!airdropId) {
         return (
             <div className="placeholder">
-                <div className="body1 secondary">
+                <div className="body1">
                     Airdrop ID is not provided.
                 </div>
             </div>
@@ -278,7 +278,7 @@ function App() {
     if (!connectedAddress) {
         return (
             <div className="placeholder">
-                <div className="body1 secondary">
+                <div className="body1">
                     Please connect your wallet to claim the token.
                 </div>
             </div>
@@ -321,18 +321,21 @@ function App() {
 
             {claimError === 423 && (
                 <div className="notify-claim-container warning">
+                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
                     <h4 className="notify-claim-title">Please connect your admin for more details</h4>
                 </div>
             )}
 
             {claimError === 429 && (
                 <div className="notify-claim-container warning">
+                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
                     <h4 className="notify-claim-title">Please wait for a while and try again</h4>
                 </div>
             )}
 
             {claimError === 404 && (
                 <div className="notify-claim-container warning">
+                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
                     <h4 className="notify-claim-title">Please check the airdrop ID or reconnect with another wallet</h4>
                 </div>
             )}
@@ -342,7 +345,8 @@ function App() {
                     <List.Item title="Available amount for claim">
                         {toDecimals(
                             userClaimInfo.available_jetton_amount,
-                            jettonInfo?.metadata.decimals ?? 9
+                            jettonInfo?.metadata.decimals ?? 9,
+                            true
                         )}{' '}
                         {jettonInfo?.metadata.symbol}
                     </List.Item>
@@ -405,14 +409,14 @@ function App() {
                     {userClaimMessage ? (
                         <button
                             disabled={isClaiming}
-                            className="button primary label1"
+                            className={`button label1 ${isClaiming ? 'is-claiming' : ''}`}
                             onClick={handleSendMessage}
                         >
                             {isClaiming ? 'Processing...' : 'Claim!'}
                         </button>
                     ) : (
                         <button
-                            className="button secondary label1"
+                                className="button label1"
                             onClick={() => window.location.reload()}
                         >
                             Refresh

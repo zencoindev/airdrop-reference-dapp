@@ -1,13 +1,14 @@
 :root {
-  --text-color: rgba(255, 255, 255, 0.87);
-  --bg-color: #10161F;
-  --bg-content-color: #1D2633;
+  --text-color: rgba(178, 243, 66, 1);
+  --bg-color: #230B3F;
+  --bg-content-color: #313845;
   --button-bg-color: #1a1a1a;
-  --text-secondary: #8994A3;
-  --separator-color: #C2DAFF14;
+  --text-secondary: rgba(255, 255, 255, 0.5);
+  --separator-color: #464C58;
   --button-tertiary-bg-color: #2E3847;
+  --warning-color: #F34242;
 
-  --button-primary-bg-color: #45AEF5;
+  --button-primary-bg-color: #9238FF;
   --button-primary-text-color: #ffffff;
 
   font-family: "Montserrat", sans-serif;
@@ -15,6 +16,8 @@
   font-style: normal;
   color-scheme: light dark;
   color: var(--text-color);
+  letter-spacing: 0.05rem;
+  line-height: 1.3;
   background-color: var(--bg-color);
 
   font-synthesis: none;
@@ -54,7 +57,12 @@ body {
   flex-direction: column;
   position: relative;
   width: 100%;
-  max-width: 860px;
+  max-width: 448px;
+
+  background-image: url('./find-zen-bg.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .tonconnectButton {
@@ -64,29 +72,6 @@ body {
 
 .mw60 {
   flex: 1;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --text-color: #000;
-    --bg-color: #EFEEF3;
-    --button-bg-color: #f9f9f9;
-
-    --bg-content-color: #FFFFFF;
-    --text-secondary: #818C99;
-    --separator-color: #3C3C431F;
-    --button-tertiary-bg-color: #818C991F;
-
-    --button-primary-bg-color: #45AEF5;
-    --button-primary-text-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-
-  .button-cell .button {
-    filter: invert(1);
-  }
 }
 
 @keyframes rotate {
