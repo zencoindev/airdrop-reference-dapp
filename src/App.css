@@ -19,8 +19,8 @@
 }
 
 .jetton-logo {
-    width: 96px;
-    height: 96px;
+    width: 152px;
+    height: 152px;
     margin: 0 auto;
 }
 
@@ -34,9 +34,8 @@
 }
 
 .body1 {
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 500;
+    font-size: 24px;
+    font-weight: 400;
 }
 
 .secondary {
@@ -48,15 +47,15 @@
 }
 
 h2 {
-    font-weight: bold;
+    font-weight: normal;
     font-size: 24px;
-    line-height: 32px;
     margin-bottom: 0;
 }
 
 .list {
     background-color: var(--bg-content-color);
-    border-radius: 16px;
+    border: 1px solid var(--separator-color);
+    border-radius: 24px;
     display: flex;
     flex-direction: column;
 }
@@ -68,12 +67,25 @@ h2 {
     align-items: center;
 }
 
+.list .item .item-title {
+    font-size: 14px;
+    text-align: left;
+}
+
+.list .item .item-value {
+    font-weight: 400;
+    line-height: 1.2;
+    text-align: right;
+    color: white;
+}
+
 .list .divider {
     height: 1px;
     background-color: var(--separator-color);
     /* compensate height */
     margin-bottom: -1px;
-    margin-left: 16px;
+    margin-left: 18px;
+    margin-right: 18px;
 }
 
 .button-cell {
@@ -88,7 +100,6 @@ h2 {
 .button-cell .value {
     font-weight: 600;
     font-size: 16px;
-    line-height: 24px;
     width: 40px;
 }
 
@@ -103,7 +114,8 @@ h2 {
     fill: var(--text-color);
 }
 
-.button-cell .button.disabled {
+.button-cell .button.is-claiming {
+    cursor: wait;
     opacity: 0.4;
 }
 
@@ -121,26 +133,22 @@ input[type='reset'] {
 
 .button {
     width: 100%;
-    border-radius: 16px;
-    height: 56px;
+    border-radius: 10px;
+    padding: 6px 20px;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.button.primary {
-    padding: 20px;
     background-color: var(--button-primary-bg-color);
-    color: var(--button-primary-text-color);
 }
 
 .label1 {
     font-size: 16px;
-    line-height: 24px;
-    font-weight: 600;
+    font-weight: 400;
+    color: var(--button-primary-text-color);
 }
 
 .end-page {
+    width: 100%;
     margin-top: auto;
     margin-left: auto;
     margin-right: auto;
@@ -329,8 +337,8 @@ input[type='reset'] {
 
 .notify-claim-container {
     margin: 16px 0 24px;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 5px 10px;
+    border-radius: 10px;
 }
 
 .notify-claim-container.info {
@@ -339,15 +347,22 @@ input[type='reset'] {
 }
 
 .notify-claim-container.warning {
-    background-color: rgba(253, 126, 20, 0.1);
-    border-left: 4px solid #FD7E14;
+    display: flex;
+    gap: 10px;
+    background-color: var(--warning-color);
+}
+
+.notify-claim-container.warning .attention-icon {
+    width: auto;
+    height: 24px;
 }
 
 .notify-claim-title {
     font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    color: var(--tg-theme-text-color);
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    text-align: left;
 }
 
 .notify-claim-date {
