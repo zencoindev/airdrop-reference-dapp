@@ -13,5 +13,5 @@ export default defineConfig({
       strict: false,
     },
   },
-  base
+  base: '/',
 })
