@@ -5,7 +5,7 @@ import { execSync } from 'child_process'
 
 const branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
 
-const base = branch === 'main' ? '/airdrop-reference-dapp/' : `/airdrop-reference-dapp/${branch}/`
+const base = '/airdrop-reference-dapp/';
 
 export default defineConfig({
   plugins: [nodePolyfills(), react()],
