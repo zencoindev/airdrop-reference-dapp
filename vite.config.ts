@@ -8,5 +8,10 @@ const base = branch === 'main' ? '/airdrop-reference-dapp/' : `/airdrop-referenc
 
 export default defineConfig({
   plugins: [nodePolyfills(), react()],
+  server: {
+    fs: {
+      strict: false,
+    },
+  },
   base
 })
