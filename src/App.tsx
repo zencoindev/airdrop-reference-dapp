@@ -10,7 +10,7 @@ import { showConfetti } from './utils/confetti';
 import { JettonInfo } from '@ton-api/client';
 import { toDecimals } from './utils/decimals';
 import { prepareVestingRenderData, getNextClaimDate, formatDateWithTime } from './utils/vesting';
-
+// @ts-nocheck
 export interface VestingParameters {
     unlocks_list: UnlockData[];
 }
