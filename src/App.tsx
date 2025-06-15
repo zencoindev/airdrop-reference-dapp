@@ -76,6 +76,7 @@ export interface InternalMessage {
  * @param userClaim - The claim data containing message details
  * @returns A transaction object with a 5-minute validity period
  */
+// @ts-ignore
 const getTxFromUserClaim = (message: InternalMessage) => ({
     validUntil: Math.floor(Date.now() / 1000) + 5 * 60, // 5 minutes
     messages: [
