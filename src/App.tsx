@@ -109,7 +109,7 @@ export type AirdropClaimResponse = AirdropClaimSuccess | AirdropClaimError;
 function useQuery() {
     return useMemo(() => new URLSearchParams(window.location.search), []);
 }
-
+// @ts-ignore
 const errorMessages: Record<string, string> = {
     425: 'The nearest vesting date has not arrived yet',
     409: 'All Jettons have already been claimed', // Check
@@ -143,17 +143,21 @@ function App() {
     const [tonConnectUI] = useTonConnectUI();
 
     // States for claim data, jetton info, error messages, and loading status.
+    // @ts-ignore
     const [isClaimInfoLoading, setIsClaimInfoLoading] = useState(true);
     const [userClaimInfo, setUserClaimInfo] = useState<UserClaimInfo | null>(
         null
     );
+    // @ts-ignore
     const [userClaimMessage, setUserClaimMessage] =
         useState<InternalMessage | null>(null);
+    // @ts-ignore
     const [claimError, setClaimError] = useState<number | null>(null);
     const [jettonAddress, setJettonAddress] = useState<string | null>(
         previewJetton
     );
     const [jettonInfo, setJettonInfo] = useState<JettonInfo | null>(null);
+    // @ts-ignore
     const [isClaiming, setIsClaiming] = useState(false);
 
     /**
