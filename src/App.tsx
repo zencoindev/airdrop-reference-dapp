@@ -1,15 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {useEffect, useMemo, useState } from 'react';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { TonApiClient } from '@ton-api/client';
 import { Address } from '@ton/core';
 
 import './App.css';
-import { List } from './components/List/List';
-import { Loader } from './components/Loader/Loader';
-import { showConfetti } from './utils/confetti';
 import { JettonInfo } from '@ton-api/client';
-import { toDecimals } from './utils/decimals';
-import { prepareVestingRenderData, getNextClaimDate, formatDateWithTime } from './utils/vesting';
 // @ts-nocheck
 export interface VestingParameters {
     unlocks_list: UnlockData[];
