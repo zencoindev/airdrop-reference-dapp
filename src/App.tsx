@@ -1,16 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {useEffect, useMemo, useState } from 'react';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { TonApiClient } from '@ton-api/client';
 import { Address } from '@ton/core';
 
 import './App.css';
-import { List } from './components/List/List';
-import { Loader } from './components/Loader/Loader';
-import { showConfetti } from './utils/confetti';
 import { JettonInfo } from '@ton-api/client';
-import { toDecimals } from './utils/decimals';
-import { prepareVestingRenderData, getNextClaimDate, formatDateWithTime } from './utils/vesting';
-
+// @ts-nocheck
 export interface VestingParameters {
     unlocks_list: UnlockData[];
 }
@@ -81,6 +76,7 @@ export interface InternalMessage {
  * @param userClaim - The claim data containing message details
  * @returns A transaction object with a 5-minute validity period
  */
+// @ts-ignore
 const getTxFromUserClaim = (message: InternalMessage) => ({
     validUntil: Math.floor(Date.now() / 1000) + 5 * 60, // 5 minutes
     messages: [
@@ -114,7 +110,7 @@ export type AirdropClaimResponse = AirdropClaimSuccess | AirdropClaimError;
 function useQuery() {
     return useMemo(() => new URLSearchParams(window.location.search), []);
 }
-
+// @ts-ignore
 const errorMessages: Record<string, string> = {
     425: 'The nearest vesting date has not arrived yet',
     409: 'All Jettons have already been claimed', // Check
@@ -148,17 +144,21 @@ function App() {
     const [tonConnectUI] = useTonConnectUI();
 
     // States for claim data, jetton info, error messages, and loading status.
+    // @ts-ignore
     const [isClaimInfoLoading, setIsClaimInfoLoading] = useState(true);
     const [userClaimInfo, setUserClaimInfo] = useState<UserClaimInfo | null>(
         null
     );
+    // @ts-ignore
     const [userClaimMessage, setUserClaimMessage] =
         useState<InternalMessage | null>(null);
+    // @ts-ignore
     const [claimError, setClaimError] = useState<number | null>(null);
     const [jettonAddress, setJettonAddress] = useState<string | null>(
         previewJetton
     );
     const [jettonInfo, setJettonInfo] = useState<JettonInfo | null>(null);
+    // @ts-ignore
     const [isClaiming, setIsClaiming] = useState(false);
 
     /**
@@ -239,48 +239,21 @@ function App() {
             });
     }, [jettonAddress, ta]);
 
-    /**
-     * Handles sending the airdrop claim transaction.
-     */
-    const handleSendMessage = useCallback(() => {
-        if (!userClaimMessage) {
-            throw new Error('Claim message is not available');
-        }
-
-        const tx = getTxFromUserClaim(userClaimMessage);
-        tonConnectUI.sendTransaction(tx).then(() => {
-            setIsClaiming(true);
-            showConfetti();
-        });
-    }, [userClaimMessage, tonConnectUI]);
-
-    // If no Airdrop ID is provided, show an early error message.
-    if (!airdropId) {
-        return (
-            <div className="placeholder">
-                <div className="body1">
-                    Airdrop ID is not provided.
-                </div>
-            </div>
-        );
-    }
-
-    // While claim data is loading, show the loader.
-    if (isClaimInfoLoading) {
-        return (
-            <div className="placeholder">
-                <Loader />
-            </div>
-        );
-    }
 
     // If no wallet is connected, instruct the user to connect their wallet.
     if (!connectedAddress) {
         return (
-            <div className="placeholder">
-                <div className="body1">
-                    Please connect your wallet to claim the token.
-                </div>
+            <div className="mw60 flex flex-column">
+                <div className="padding-top" />
+                {jettonInfo && (
+                    <img
+                        alt={jettonInfo.metadata.name}
+                        className="jetton-logo"
+                        src={jettonInfo.preview}
+                    />
+                )}
+                <h2><b>Airdrop</b> is complete</h2>
+                <h3>Season 2 is coming...</h3>
             </div>
         );
     }
@@ -296,134 +269,8 @@ function App() {
                     src={jettonInfo.preview}
                 />
             )}
-            <div className="desc-container mb32">
-                <h2>
-                    {claimError
-                        ? errorMessages[claimError] ?? 'Unknown error'
-                        : 'Claim your tokens'}
-                </h2>
-            </div>
-
-
-            {claimError === 425 && userClaimInfo?.vesting_parameters && (
-                <div className="notify-claim-container info">
-                    <h4 className="notify-claim-title">Next claim available:</h4>
-                    <div className="notify-claim-date">
-                        {(() => {
-                            const nextDate = getNextClaimDate(userClaimInfo);
-                            return nextDate 
-                                ? formatDateWithTime(nextDate)
-                                : 'No future claims available';
-                        })()}
-                    </div>
-                </div>
-            )}
-
-            {claimError === 423 && (
-                <div className="notify-claim-container warning">
-                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
-                    <h4 className="notify-claim-title">Please connect your admin for more details</h4>
-                </div>
-            )}
-
-            {claimError === 429 && (
-                <div className="notify-claim-container warning">
-                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
-                    <h4 className="notify-claim-title">Please wait for a while and try again</h4>
-                </div>
-            )}
-
-            {claimError === 404 && (
-                <div className="notify-claim-container warning">
-                    <img src='./icon-outline_attention.png' alt='attention icon' className='attention-icon' />
-                    <h4 className="notify-claim-title">Please check the airdrop ID or reconnect with another wallet</h4>
-                </div>
-            )}
-
-            {userClaimMessage && (claimError ===  null || claimError === 423 || claimError === 429) && userClaimInfo && (
-                <List>
-                    <List.Item title="Available amount for claim">
-                        {toDecimals(
-                            userClaimInfo.available_jetton_amount,
-                            jettonInfo?.metadata.decimals ?? 9,
-                            true
-                        )}{' '}
-                        {jettonInfo?.metadata.symbol}
-                    </List.Item>
-
-                    {userClaimMessage && (
-                        <List.Item title="To be paid">
-                            ~{toDecimals(userClaimMessage.amount, 9)} TON
-                        </List.Item>
-                    )}
-                </List>
-            )}
-
-            {userClaimInfo?.vesting_parameters && (
-                <div className="vesting-container">
-                    <h3 className="vesting-title">Vesting Timeline</h3>
-                    <div className="timeline">
-                        {prepareVestingRenderData(
-                            userClaimInfo,
-                            typeof jettonInfo?.metadata.decimals === 'string'
-                                ? parseInt(jettonInfo.metadata.decimals)
-                                : jettonInfo?.metadata.decimals ?? 9,
-                            jettonInfo?.metadata.symbol
-                        ).map(item => (
-                            <div key={item.key} className="timeline-item">
-                                <div className="timeline-marker-container">
-                                    <div className="timeline-line-top"></div>
-                                    <div className={`timeline-marker ${item.status}`}>
-                                        {item.status === 'claimed' && (
-                                            <span className="checkmark">✓</span>
-                                        )}
-                                        {item.status === 'claimable' && (
-                                            <span className="claimable-icon">!</span>
-                                        )}
-                                    </div>
-                                    <div
-                                        className="timeline-line-bottom"
-                                        style={{
-                                            display: item.isLastItem ? 'none' : 'block'
-                                        }}
-                                    ></div>
-                                </div>
-                                <div className={`timeline-content status-${item.status}`}>
-                                    <div className="timeline-date">
-                                        <span className="date-label">{item.date}</span>
-                                        <span className="date-status">{item.statusText}</span>
-                                    </div>
-                                    <div className="timeline-details">
-                                        <div className="vesting-percentage">{item.percentage}</div>
-                                        <div className="vesting-amount">{item.amount}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            <div className="end-page">
-                <div className="mw60">
-                    {userClaimMessage ? (
-                        <button
-                            disabled={isClaiming}
-                            className={`button label1 ${isClaiming ? 'is-claiming' : ''}`}
-                            onClick={handleSendMessage}
-                        >
-                            {isClaiming ? 'Processing...' : 'Claim!'}
-                        </button>
-                    ) : (
-                        <button
-                                className="button label1"
-                            onClick={() => window.location.reload()}
-                        >
-                            Refresh
-                        </button>
-                    )}
-                </div>
-            </div>
+            <h2><b>Airdrop</b> is complete</h2>
+            <h3>Season 2 is coming...</h3>
         </div>
     );
 }
